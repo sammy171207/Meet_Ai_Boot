@@ -1,39 +1,20 @@
+import { auth } from '@/lib/auth'
+import { HomeView } from '@/modules/home/ui/views/home-view'
+import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
+import React from 'react'
 
-'use client'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input';
-import { authClient } from '@/lib/auth-client';
-import React, { useState } from 'react'
+const Page = async () => {
+  const session=await auth.api.getSession({
+    headers:await headers()
+  })
 
-const Home = () => {
-  const [name,setName]=useState<string>("");
-  const [email,setEmail]=useState<string>('');
-  const [password,setPassword]=useState<string>('');
- 
-
-  const handleSubmit=async(e:React.FormEvent<HTMLButtonElement>)=>{
-    e.preventDefault();
-    console.log(name,email,password);
-    await authClient.signUp.email({name,email,password},{
-      onSuccess: (data) => {
-        console.log(data)
-        alert('success')
-      },
-      onError: (error) => {
-        console.log(error)
-      }
-    })
-    alert('success')
+  if(!session) {
+    redirect("sign-in")
   }
-
   return (
-    <div className='text-3xl font-bold underline'>
-      <Input type='text' placeholder='name' value={name} onChange={(e)=>setName(e.target.value)}/>
-      <Input type='email' placeholder='email' value={email} onChange={(e)=>setEmail(e.target.value)}/>
-      <Input type='password' placeholder='password' value={password} onChange={(e)=>setPassword(e.target.value)}/>
-      <Button  onClick={handleSubmit}>Submit</Button>
-    </div>
+    <HomeView/>
   )
 }
 
-export default Home
+export default Page
