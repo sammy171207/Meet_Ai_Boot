@@ -40,7 +40,32 @@ export const SignInView = () => {
         setPending(true);
         const {error}=await authClient.signIn.email({
             email:data.email,
-            password:data.password
+            password:data.password,
+            callbackURL:'/',
+            
+        },{
+            onSuccess: (data) => {
+                console.log(data)
+                router.push("/")
+            }
+            ,
+            onError: ({error}) => {
+                console.log(error)
+                setPending(false);
+                setError(error.message)
+            }
+        },
+    );
+       
+
+    }
+
+      const onSocialSubmit = async (provider: "github" | "google") => {
+        setError(null);
+        setPending(true);
+        const {error}=await authClient.signIn.social({
+            provider:provider,   
+            callbackURL:'/',
         },{
             onSuccess: (data) => {
                 console.log(data)
@@ -62,7 +87,7 @@ export const SignInView = () => {
         <div className="flex flex-col gap-6">
             <Card className=" p-0">
                 <CardContent className="grid p-0 md:grid-cols-2">
-                    <Form {...form}>
+                    <Form {...(form as any)}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 md:p-8">
                             <div className="flex flex-col gap-6">
                                 <div className="flex flex-col items-center text-center">
@@ -122,6 +147,7 @@ export const SignInView = () => {
                                       className="w-full"
                                       variant="outline"
                                       type="button"
+                                      onClick={()=>onSocialSubmit("google")}
                                       >
                                         Google
                                     </Button>
@@ -129,6 +155,7 @@ export const SignInView = () => {
                                       className="w-full"
                                       variant="outline"
                                       type="button"
+                                      onClick={()=>onSocialSubmit("github")}
                                       >
                                         Github
                                     </Button>

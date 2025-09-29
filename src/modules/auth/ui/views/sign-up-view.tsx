@@ -48,7 +48,8 @@ export const SignUpView = () => {
         const { error } = await authClient.signUp.email({
             name: data.name,
             email: data.email,
-            password: data.password
+            password: data.password,
+            callbackURL: '/',
         }, {
             onSuccess: (data) => {
                 console.log(data)
@@ -63,6 +64,29 @@ export const SignUpView = () => {
         },
         );
 
+
+    }
+
+       const onSocialSubmit = async (provider: "github" | "google") => {
+        setError(null);
+        setPending(true);
+        const {error}=await authClient.signIn.social({
+            provider:provider,   
+            callbackURL:'/',
+        },{
+            onSuccess: (data) => {
+                console.log(data)
+                router.push("/")
+            }
+            ,
+            onError: ({error}) => {
+                console.log(error)
+                setPending(false);
+                setError(error.message)
+            }
+        },
+    );
+       
 
     }
 
@@ -154,6 +178,7 @@ export const SignUpView = () => {
                                         className="w-full"
                                         variant="outline"
                                         type="button"
+                                        onClick={()=>onSocialSubmit("google")}
                                     >
                                         Google
                                     </Button>
@@ -161,6 +186,7 @@ export const SignUpView = () => {
                                         className="w-full"
                                         variant="outline"
                                         type="button"
+                                           onClick={()=>onSocialSubmit("github")}
                                     >
                                         Github
                                     </Button>
